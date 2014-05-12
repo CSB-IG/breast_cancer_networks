@@ -1,0 +1,17 @@
+#!/bin/bash
+
+EXPFILE={{ expfile }}
+AFFYID={{ affyid }}
+P={{ p }}
+OUTDIR={{ outdir }}
+OUTPUT=`basename $EXPFILE .exp`_${AFFYID}_${P}.adj
+
+mkdir -p $OUTDIR
+
+cd ~/ARACNE
+./aracne2 \
+    -i $EXPFILE \
+    -h $AFFYID \
+    -e $P \
+    -o $OUTDIR/$OUTPUT
+
