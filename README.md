@@ -4,7 +4,7 @@
 Breast cancer studies
 ---------------------
 
-<p>Una vez hechos todos los scripts con "genera_todos" se crea una carpeta donde guardaremos los scripts que llamarán cada una de las comaladas. Dentro de el se crea este archivo "todos" que contiene la lista de todos los .sh (uno por gen)</p>
+<p>Una vez hechos todos los scripts con "genera_todos.sh" se crea una carpeta donde guardaremos los scripts que llamarán cada una de las comaladas. Dentro de el se crea este archivo "todos" que contiene la lista de todos los .sh (uno por gen)</p>
 
 <pre><code>ls ../*sh | sort | awk '{print $1" &"}' > todos
 </code></pre>
