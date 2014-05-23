@@ -12,11 +12,11 @@ __Herramientas__
 
 <p>Usamos el software <a href="http://wiki.c2b2.columbia.edu/califanolab/index.php/Software/ARACNE">ARACNe</a> de <a href="http://www.nature.com/nprot/journal/v1/n2/full/nprot.2006.106.html">Magnoli et al. 2006</a> que básicamente estima la información mutua (MI) entre pares de genes a lo largo de todas las muestras y con ello genera una matriz de adyacencia con el valor de MI obtenido.
 </p>
-<p>Contamos con una computadora con 34 CPUs y 370 GB de RAM. Como cada comando de ARACNe ocupa un solo CPU y el cálculo por gen es independiente, se desarrlló una técnica para generar scripts que corrieran una proceso de ARACNe por gen a partir de una lista de genes de tal forma que pudieramos usar tantos CPUs como desearamos al mismo tiempo. Por tanto se desarrolló un script de Phyton (genera_scripts.py) que genera el script con el comando de ARACNe para un gen a la vez a partir de una lista deseada usando una plantilla (aracne.tt)
-</p>
 
 __Optimización de sofware para el equipo de cómputo__
 
+<p>Contamos con una computadora con 32 CPUs y 380 GB de RAM. Como cada comando de ARACNe ocupa un solo CPU y el cálculo por gen es independiente, se desarrolló una técnica para generar scripts que corrieran un gen por proceso de ARACNe a partir de una lista de genes de tal forma que pudieramos usar tantos CPUs como desearamos al mismo tiempo. Por tanto se desarrolló un script de Phyton (genera_scripts.py) que genera el script con el comando de ARACNe para un gen a la vez a partir de una lista deseada usando una plantilla (aracne.tt)
+</p>
 <p>Como ya se mencionó, el script "genera\_scripts.py" por si solo genera todos los scripts individuales a partir de la lista de genes a explorar. Pero como en este trabajo se requería de una gama de convinaciones de parámetros se usa un script intermedio (genera_todos.sh) que sirve para controlar las convinaciones de parametros y muestras que se van a usar.
 </p>
 <p>Una vez hechos todos los scripts con "genera_todos.sh" se crea una carpeta donde guardaremos los scripts que llamarán cada una de las comaladas. Dentro de el se crea este archivo "todos" que contiene la lista de todos los .sh (uno por gen)</p>
