@@ -13,6 +13,27 @@ __Herramientas__
 <p>Usamos el software <a href="http://wiki.c2b2.columbia.edu/califanolab/index.php/Software/ARACNE">ARACNe</a> de <a href="http://www.nature.com/nprot/journal/v1/n2/full/nprot.2006.106.html">Magnoli et al. 2006</a> que básicamente estima la información mutua (MI) entre pares de genes a lo largo de todas las muestras y con ello genera una matriz de adyacencia con el valor de MI obtenido.
 </p>
 
+
+
+__HT Condor__
+
+Para generar el condor submit file:
+
+<pre><code>
+python ~/parallel_ARACNe/genera_condor.py \
+       --expfile /home/hachepunto/1191/Expression_Matrix_22283_affyid_sanos.txt \
+       --affyids /home/hachepunto/all_network/all_affyid.txt \
+       --run_id sanos_10 \
+       --outdir /home/hachepunto/all_network/sanos_10 \
+       --p 1e-10
+</code></pre>
+Ejecutar este comando genera un script sanos_10.condor en $outdir. Luego hay que someterlo asi:
+
+<pre><code>
+cd $outdir
+condor_submit sanos_10.condor
+</code></pre>
+
 __Optimización de sofware para el equipo de cómputo__
 
 <p>Contamos con una computadora con 32 CPUs y 380 GB de RAM. Como cada comando de ARACNe ocupa un solo CPU y el cálculo por gen es independiente, se desarrolló una técnica para generar scripts que corrieran un gen por proceso de ARACNe a partir de una lista de genes de tal forma que pudieramos usar tantos CPUs como desearamos al mismo tiempo. Por tanto se desarrolló un script de Phyton (genera_scripts.py) que genera el script con el comando de ARACNe para un gen a la vez a partir de una lista deseada usando una plantilla (aracne.tt)
