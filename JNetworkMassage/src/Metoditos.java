@@ -6,15 +6,12 @@
 
 
 import fileOperations.*;
-import jsc.*;
+
 //import java.io.*;
 import java.util.*;
 import java.text.DecimalFormat;
 import java.lang.Object;
-import jsc.correlation.SpearmanCorrelation;
-import jsc.datastructures.PairedData;
-import jsc.regression.PearsonCorrelation;
-import jsc.tests.H1;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.applet.*;
@@ -280,7 +277,7 @@ public class Metoditos {
              System.out.print(s + "\t");
             while(s.contains("\t")==true){
 //                 System.out.print(st.nextToken()+"\t");
-                 s = st.nextToken().c;
+//                 s = st.nextToken().c;
             }
             System.out.println();
        

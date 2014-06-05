@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-import aguaspkg.Metoditos;
 import java.io.File;
 import java.io.FilenameFilter;
 import fileOperations.*;
