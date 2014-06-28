@@ -13,7 +13,7 @@ args = parser.parse_args()
 #writer = csv.writer(args.newnetwork)
 
 G = nx.Graph()
-edges = [l.strip().split() for l in margs.input.readlines()]
+edges = [l.strip().split() for l in args.input.readlines()]
 
 for e in edges:
     G.add_edge(e[0],e[2],weight=float(e[1]))
