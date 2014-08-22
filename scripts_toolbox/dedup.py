@@ -2,7 +2,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='will remove lines with duplicate data regardless of key')
 parser.add_argument('--input', type=argparse.FileType('r'), required=True, 
-                   help='file to transpose')
+                   help='file to process')
 
 args = parser.parse_args()
 
@@ -10,6 +10,7 @@ lineas = args.input.readlines()
 
 
 p = {}
+
 for l in lineas:
     campos = l.split()
     sample = campos[0]
@@ -20,10 +21,15 @@ for l in lineas:
         p[datos]=[sample,]
 
 
+
 redundantes = []
 for datos in p:
     if len(p[datos])>1:
         redundantes+=p[datos][1:]
 
-for l in redundantes:
-    print l
+for l in lineas:
+    campos = l.split()
+    sample = campos[0]
+    if not sample in redundantes:
+        print l.strip()
+
