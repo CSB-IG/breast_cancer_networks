@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 
 parser = argparse.ArgumentParser(description='print to stdout transposed file')
 parser.add_argument('--input', type=argparse.FileType('r'), required=True, 
@@ -16,17 +17,9 @@ for i in range(0,len(lineas)):
         arreglote[i].append(columnas[j])
         
 
+t = np.array(arreglote)
 
 
-for i in range(0,len(arreglote)):
-    filas = arreglote[i]
-    renglon = []
-    for j in range(0,len(filas)):
-        try:
-            renglon.append(arreglote[j][i])
-        except:
-            pass
-    if renglon:
-        print "\t".join(renglon)
-
+for renglon in t.swapaxes(0,1):
+    print "\t".join(renglon)
 
