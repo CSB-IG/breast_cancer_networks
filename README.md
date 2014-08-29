@@ -21,6 +21,7 @@ Ejemplo para generar el condor submit file:
 
 <pre><code>
 python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
+       --path_to_aracne2 ~/ARACNE/aracne2 \
        --expfile /media/c/breast_cancer_networks_main/data/Expression_Matrix_22283_affyid_sanos.txt \
        --affyids /home/hachepunto/all_network/all_affyid.txt \
        --run_id sanos_10 \
