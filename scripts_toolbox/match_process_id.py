@@ -35,12 +35,12 @@ gene_sym.remove("gene_symbol")
 
 #abrimos el archivo salida
 salida = open(sys.argv[2]+".txt", "w")
-salida.writelines(["aff_id","\t\t","gene_symbol", "\n"])
+salida.writelines(["aff_id","\t","gene_symbol", "\n"])
 
 for genes in gene_p:
 	for i in range (len(gene_aff_id)):
 		if gene_sym[i].replace("\"","") == genes.replace("\"",""):
-			salida.writelines([genes,"\t\t", gene_aff_id[i], "\n"])
+			salida.writelines([genes,"\t", gene_aff_id[i], "\n"])
 
 salida.close()
 
