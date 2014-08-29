@@ -17,11 +17,11 @@ __Herramientas__
 
 __HT Condor__
 
-Para generar el condor submit file:
+Ejemplo para generar el condor submit file:
 
 <pre><code>
-python ~/parallel_ARACNe/genera_condor.py \
-       --expfile /home/hachepunto/1191/Expression_Matrix_22283_affyid_sanos.txt \
+python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
+       --expfile /media/c/breast_cancer_networks_main/data/Expression_Matrix_22283_affyid_sanos.txt \
        --affyids /home/hachepunto/all_network/all_affyid.txt \
        --run_id sanos_10 \
        --outdir /home/hachepunto/all_network/sanos_10 \
