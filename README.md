@@ -13,6 +13,7 @@ __Tools__
 
 __HT Condor__
 
+<<<<<<< HEAD
 For generate the Condor_submit File:
 
 <pre><code>
@@ -20,6 +21,15 @@ python ~/parallel_ARACNe/genera_condor.py \
 	   --path_to_aracne2 /home/hachepunto/ARACNE/aracne2
        --expfile /home/hachepunto/1191/Expression_Matrix_genesym_sanos.txt \
        --affyids /home/hachepunto/all_network/all_genesym.txt \
+=======
+Ejemplo para generar el condor submit file:
+
+<pre><code>
+python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
+       --path_to_aracne2 ~/ARACNE/aracne2 \
+       --expfile /media/c/breast_cancer_networks_main/data/Expression_Matrix_22283_affyid_sanos.txt \
+       --affyids /home/hachepunto/all_network/all_affyid.txt \
+>>>>>>> e5adc16cea9b6ecab2fc486cad29da98150db3e2
        --run_id sanos_10 \
        --outdir /home/hachepunto/all_network/sanos_10 \
 	   --kernel_width 0.10 \
