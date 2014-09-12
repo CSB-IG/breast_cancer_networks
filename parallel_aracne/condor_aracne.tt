@@ -3,12 +3,13 @@ error      = {{ run_id }}.error
 universe   = vanilla                  
 log        = {{ run_id }}.log                                                    
 
-{% for id in affyids %}
+{% for id in probes %}
 
 Arguments = -i {{ expfile }} \
             -h {{ id }} \
+            -k {{ kerwid }} \
             -p {{ p }} \
-            -o {{ outdir }}/{{ id }}_{{ p }}.adj
+            -o {{ outdir }}/{{ id }}_{{ kerwid }}_{{ p }}.adj
 Output       = {{ id }}_{{ p }}.log
 Error        = {{ id }}_{{ p }}.err
 Queue
