@@ -35,6 +35,6 @@ condor_submit run_id.condor
 
 <p> The kernel width must be calculate based on the number of samples and can be estimate with the formula:</p>
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=k%3D0.525%20%5Ctimes%20n%5E%7B-0.24%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+k=0.525 × n^-0.24
 
 <p>Where n is the number of samples (see more in <a href="http://www.nature.com/nprot/journal/v1/n2/full/nprot.2006.106.html">Magnoli et al. 2006</a> suplementary material)</p>
