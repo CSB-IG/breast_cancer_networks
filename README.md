@@ -37,8 +37,4 @@ condor_submit run_id.condor
 
 k=0.525 × n^-0.24
 
-<pre><code>
-kernel.width <- function(x) 0.525*x^-0.24 #for R
-</code></pre>
-
 <p>Where n is the number of samples (see more in <a href="http://www.nature.com/nprot/journal/v1/n2/full/nprot.2006.106.html">Magnoli et al. 2006</a> suplementary material)</p>
