@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description='Generates condor submit file for a
 parser.add_argument('--path_to_aracne2',  type=argparse.FileType('r'), required=True, help='path to aracne2 binary')
 parser.add_argument('--expfile',  type=argparse.FileType('r'), required=True, help='expression file')
 parser.add_argument('--probes',  type=argparse.FileType('r'), required=True, help='probes, one in every line' )
-parser.add_argument('--kernel_width',  type=argparse.FileType('r'), required=True, help='kernel width based on the number of samples' )
+parser.add_argument('--kernel_width', required=True, help='kernel width based on the number of samples' )
 parser.add_argument('--run_id',  required=True, help="name of condor run" )
 parser.add_argument('--outdir',  required=True, help="outdir for adj matrices" )
 parser.add_argument('--p',  required=True, help="P-value: e.g. 1e-7" )
