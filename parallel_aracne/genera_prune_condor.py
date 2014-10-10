@@ -36,6 +36,7 @@ os.chdir(args.outdir)
 
 # create one prune script per line
 lineas = args.adj.readlines()
+matrix_name = os.path.basename(args.adj.name)
 
 for linea in lineas:
     if not linea.startswith('>'):
@@ -44,9 +45,7 @@ for linea in lineas:
         gene_id = gene_list[0]
 
         with open("condor_%s_prune.py" % gene_id, 'w') as f:
-            f.write( template.render( gene_line = gene_line,
-                                      p         = args.p,
-                                      mi        = "%f" % mi ) )
-
-
-        
+            f.write( template.render( gene_line   = gene_line,
+                                      matrix_name = matrix_name,
+                                      p           = args.p,
+                                      mi          = "%f" % mi ) )
