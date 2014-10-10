@@ -38,14 +38,34 @@ os.chdir(args.outdir)
 lineas = args.adj.readlines()
 matrix_name = os.path.basename(args.adj.name)
 
+
+
+
+scripts = []
 for linea in lineas:
     if not linea.startswith('>'):
         gene_line = linea.strip()
         gene_list = gene_line.split()
         gene_id = gene_list[0]
-
-        with open("condor_%s_prune.py" % gene_id, 'w') as f:
+        prune_script = "condor_%s_prune.py" % gene_id
+        with open(prune_script, 'w') as f:
             f.write( template.render( gene_line   = gene_line,
                                       matrix_name = matrix_name,
                                       p           = args.p,
                                       mi          = "%f" % mi ) )
+        scripts.append(prune_script)
+
+
+
+stanza = """
+Arguments = {s}
+Error = {s}.err
+Queue
+"""
+
+with open('%s.condor' % matrix_name,'w') as condor_file:
+    condor_file.write("""executable = python
+universe   = vanilla
+""")
+    for s in scripts:
+        condor_file.write(stanza.format(s=s))
