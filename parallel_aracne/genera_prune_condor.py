@@ -64,7 +64,7 @@ Queue
 """
 
 with open('%s.condor' % matrix_name,'w') as condor_file:
-    condor_file.write("""executable = python
+    condor_file.write("""executable = /usr/bin/python
 universe   = vanilla
 """)
     for s in scripts:
