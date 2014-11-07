@@ -1,4 +1,7 @@
 
+import os
+
+
 # probando 1, 2, 3
 mi = {{ mi }}
 p  = {{ p }}
@@ -20,3 +23,5 @@ adj_filename = "%s_%s_%s.adj" % (main_gene, matrix_name, p)
 with open(adj_filename, 'w') as f:
     f.write("\t".join(filtered))
     f.write("\n")
+
+os.remove(os.path.realpath(__file__))
