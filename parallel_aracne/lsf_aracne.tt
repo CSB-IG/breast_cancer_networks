@@ -1,8 +1,8 @@
 #BSUB-q High
-#BSUB-o {{ probeid }}.log
+#BSUB-o {{ outdir }}/{{ probeid }}.log
 #BSUB-J {{ probeid }}
 
-aracne.sh -i {{ expfile }} \
+{{ outdir }}/aracne.sh -i {{ expfile }} \
              -h {{ probeid }} {% if kerwid %}-k {{ kerwid }} {% endif %} \
              -p {{ p }} \
              -o {{ outdir }}/{{ probeid }}.adj
