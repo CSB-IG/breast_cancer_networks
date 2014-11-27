@@ -21,7 +21,6 @@ python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
 	--probes /home/hachepunto/transfac_network/human_transfacs.txt \
 	--run_id transfac_all_10 \
 	--outdir /home/hachepunto/transfac_network/transfac_all_10 \
-	--kernel_width 0.10 \
 	--p 1e-10
 ```
 
@@ -30,12 +29,6 @@ python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
 <pre><code>cd $outdir
 condor_submit run_id.condor
 </code></pre>
-
-<p> The kernel width must be calculate based on the number of samples and can be estimate with the formula:</p>
-
-k = 0.525 × n^-0.24
-
-<p>Where n is the number of samples (see more in <a href="http://www.nature.com/nprot/journal/v1/n2/full/nprot.2006.106.html">  Margolin et al. 2006</a> suplementary material)</p>
 
 ### Prune whit HT Condor
 

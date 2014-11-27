@@ -7,9 +7,8 @@ log        = {{ run_id }}.log
 
 Arguments = -i {{ expfile }} \
             -h {{ id }} \
-            -k {{ kerwid }} \
             -p {{ p }} \
-            -o {{ outdir }}/{{ id }}_{{ kerwid }}_{{ p }}.adj
+            -o {{ outdir }}/{{ id }}_{{ p }}.adj
 Output       = {{ id }}_{{ p }}.log
 Error        = {{ id }}_{{ p }}.err
 Queue
