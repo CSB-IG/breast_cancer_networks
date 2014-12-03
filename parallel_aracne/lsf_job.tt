@@ -16,3 +16,6 @@ while (@ids) {
     $host = pop @hosts;
     system("lsrun -m $host /home/inmegen/r.garcia/bcnw/enfermos_1/$id.sh &");
 }
+
+
+# ref: http://www.ccs.miami.edu/hpc/lsf/7.0.6/admin/parallel.html
