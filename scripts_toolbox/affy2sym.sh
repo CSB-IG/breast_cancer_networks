@@ -2,6 +2,13 @@
 # Usage 
 # sh affy2sym.sh name_of_sif  # without extension
 
+
+sed 's/216345_at/KIAA0913/' $1.sif > tmp; mv tmp $1.sif
+sed 's/206824_at/CES4/' $1.sif > tmp; mv tmp $1.sif
+sed 's/203213_at/CDC2/' $1.sif > tmp; mv tmp $1.sif
+sed 's/214316_x_at/CALR/' $1.sif > tmp; mv tmp $1.sif
+sed 's/210483_at/TNFRSF10C/' $1.sif > tmp; mv tmp $1.sif
+sed 's/210484_s_at/TNFRSF10C/' $1.sif > tmp; mv tmp $1.sif
 sed 's/1007_s_at/DDR1/' $1.sif > tmp; mv tmp $1.sif
 sed 's/1053_at/RFC2/' $1.sif > tmp; mv tmp $1.sif
 sed 's/117_at/HSPA6/' $1.sif > tmp; mv tmp $1.sif
