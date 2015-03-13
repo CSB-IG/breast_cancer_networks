@@ -76,11 +76,9 @@ for pw in pw_gene:
                     bipartite_nw[k] = ( (pw1, pw1_enr,
                                          connection, gene_enrichment[connection],
                                          pw2, pw2_enr ))
-        
 
 
 for l in bipartite_nw.values():
     print "\t".join([str(j) for j in l])
 
-#from pprint import pprint
-#pprint(bipartite_nw)
+
