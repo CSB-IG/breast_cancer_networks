@@ -48,7 +48,7 @@ for l in nw_reader:
         gene_pw[gene] = [pw, ]
     
 
-bipartite_nw = []
+bipartite_nw = {}
 
 for pw in pw_gene:
     pw1 = pw
@@ -69,13 +69,17 @@ for pw in pw_gene:
 
 
                 if connection in gene_enrichment:
-                    bipartite_nw.append( (pw1, pw1_enr,
-                                          connection, gene_enrichment[connection],
-                                          pw2, pw2_enr ))
+                    l = [pw1, connection, pw2]
+                    l.sort()
+                    k = tuple(l)
+
+                    bipartite_nw[k] = ( (pw1, pw1_enr,
+                                         connection, gene_enrichment[connection],
+                                         pw2, pw2_enr ))
         
 
 
-for l in bipartite_nw:
+for l in bipartite_nw.values():
     print "\t".join([str(j) for j in l])
 
 #from pprint import pprint
