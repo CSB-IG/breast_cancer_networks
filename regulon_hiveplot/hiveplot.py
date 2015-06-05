@@ -4,37 +4,27 @@ import random
 
 from pprint import pprint
 
-h = Hiveplot( 'regulon.svg')
+h = Hiveplot( 'regulon_sans_FOXN3.svg')
 
 
 axis0 = Axis( (900,900), (900,10), stroke="black", stroke_width=1)   # Transcription Factor
 axis1 = Axis( (1100,900), (1100,10), stroke="black", stroke_width=1) # Transcription Factor again, to show inner interactions
 
-ms_start_x = 1100
-ms_start_y = 900
-ms_division = Axis( (ms_start_x, ms_start_y),
-                    (ms_start_x+300, ms_start_y+300),
-                    stroke="green", stroke_width=1) # Molecular Signature, Gene Onthology Cell Division
-ms_death    = Axis( (ms_start_x+300, ms_start_y+300),
-                    (ms_start_x+600, ms_start_y+600),
-                    stroke="red", stroke_width=1) # Molecular Signature, Gene Onthology Cell Death
-ms_other    = Axis( (ms_start_x+600, ms_start_y+600),
-                    (ms_start_x+900, ms_start_y+900),
-                    stroke="black", stroke_width=1) # Molecular Signature, other GO categories
+ms_axis = Axis( (1100, 900),
+                (1900, 1200),
+                stroke="black", stroke_width=1) # Molecular Signature, Gene Onthology Cell Division
 
 axis3 = Axis( (900,900), (10,1200), stroke="black", stroke_width=1)    # etc.
 
-h.axes.append( [axis0, axis1] )
-h.axes.append( [ms_division, ms_death, ms_other] )
-h.axes.append( axis3 )
+h.axes = [ axis0, axis1, ms_axis, axis3]
 
 # Load sets from files
-TF       = [tf.strip() for tf in open('factores_de_transcripcion.txt').readlines()]
-FM       = [tf.strip() for tf in open('firma_molecular_filtrada_zscore20.csv').readlines()]
-resto    = [tf.strip() for tf in open('resto.csv').readlines()]
+tf  = [f.strip() for f in open('tf_k_sorted_sans_FOXN3.csv').readlines()]
+ms  = [f.strip() for f in open('ms_k_sorted_sans_FOXN3.csv').readlines()]
+etc = [f.strip() for f in open('etc_k_sorted.csv').readlines()]
 
-division = [tf.strip() for tf in open('GeneOntology_CellDivision.csv').readlines()]
-death    = [tf.strip() for tf in open('GeneOntology_CellDeath.csv').readlines()]
+division = [f.strip() for f in open('GeneOntology_CellDivision.csv').readlines()]
+death    = [f.strip() for f in open('GeneOntology_CellDeath.csv').readlines()]
 
 
 
@@ -54,11 +44,11 @@ g.remove_edges_from(g.selfloop_edges())
 #####################
 # Add nodes to axes #
 #####################
-# TF are ordered by degree
-# an even distribution, from first to last node on both TF axes
-delta = 0.98 / float(len(TF))
+
+# an even distribution, from first to last node on both tf axes
+delta = 0.98 / float(len(tf))
 offset = 0.01
-for t in TF:
+for t in tf:
     nd = Node(t)
     axis0.add_node(nd, offset)
     nd1 = Node(t)
@@ -66,29 +56,21 @@ for t in TF:
     offset += delta
 
 
-
-    
-# add nodes to molecular signature axis
-# order by betweeness
-btwness = nx.centrality.betweenness.betweenness_centrality(g)    
-
-delta = 0.98 / float(len(FM))
+# Molecular Signature
+delta = 0.98 / float(len(ms))
 offset = 0.01
-for key, value in sorted(btwness.iteritems(), key=lambda (k,v): (v,k)):
-    if key in FM:
-        axis2.add_node(Node(key), offset)
-        offset += delta
+for n in ms:
+    ms_axis.add_node(Node(n), offset)
+    offset += delta
 
+        
 
 # add the rest of the nodes
-delta = 0.98 / float(len(resto))
+delta = 0.98 / float(len(etc))
 offset = 0.01
-#for key, value in sorted(btwness.iteritems(), key=lambda (k,v): (v,k)):
-for key in resto:
-    if key in resto:
-        axis3.add_node(Node(key), offset)
-        print key, offset
-        offset += delta
+for n in etc:
+    axis3.add_node(Node(n), offset)
+    offset += delta
 
 
 
@@ -99,6 +81,9 @@ for key in resto:
 #####################
 
 for e in g.edges():
+    if g.get_edge_data(*e)['mi'] < 0:
+        print g.get_edge_data(*e)['mi']
+        
     if (e[0] in axis0.nodes) and (e[1] in axis1.nodes):
         h.connect(axis0, e[0],
                   10,  # source angle
@@ -109,18 +94,20 @@ for e in g.edges():
                   stroke='purple',
                   fill='none')
 
-    if (e[0] in axis1.nodes) and (e[1] in axis2.nodes):
+    if (e[0] in axis1.nodes) and (e[1] in ms_axis.nodes):
+        color = 'red'
         h.connect(axis1, e[0],  45,
-                  axis2, e[1], -45,
+                  ms_axis, e[1], -45,
                   stroke_width=g.get_edge_data(*e)['mi'],
                   stroke_opacity=g.get_edge_data(*e)['mi'],
-                  stroke='red',
+                  stroke=color,
                   fill='none')
+
         
 
-    if (e[0] in axis2.nodes) and (e[1] in axis3.nodes):
+    if (e[0] in ms_axis.nodes) and (e[1] in axis3.nodes):
 
-        h.connect(axis2, e[0], 15,
+        h.connect(ms_axis, e[0], 15,
                   axis3, e[1], -15,
                   stroke_width=g.get_edge_data(*e)['mi'],
                   stroke_opacity=g.get_edge_data(*e)['mi'],
@@ -129,11 +116,12 @@ for e in g.edges():
 
         
     if (e[0] in axis3.nodes) and (e[1] in axis0.nodes):
+        color = 'blue'
         h.connect(axis0, e[1], -45,
                   axis3, e[0], 45,
                   stroke_width=g.get_edge_data(*e)['mi'],
                   stroke_opacity=g.get_edge_data(*e)['mi'],
-                  stroke='blue',
+                  stroke=color,
                   fill='none')
 
 
