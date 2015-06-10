@@ -7,8 +7,8 @@ from pprint import pprint
 h = Hiveplot( 'regulon085.svg')
 
 
-axis0 = Axis( (1000,1000), (1000,0), stroke="black", stroke_width=3)   # Transcription Factor
-axis1 = Axis( (1200,1000), (1200,0), stroke="black", stroke_width=3) # Transcription Factor again, to show inner interactions
+axis0 = Axis( (1000,1000), (950,0), stroke="black", stroke_width=3)   # Transcription Factor
+axis1 = Axis( (1200,1000), (1250,0), stroke="black", stroke_width=3) # Transcription Factor again, to show inner interactions
 
 ms_axis = Axis( (1200, 1000),
                 (2200, 1618),
@@ -38,16 +38,16 @@ for line in open('regulon_2WsC_cy40.sif').readlines():
 g.remove_edges_from(g.selfloop_edges())
 
 
-topten= { 'HIF3A' : '10',
-          'KAT7'  : '9',
-          'TFDP3' : '8',
-          'TBR1'  : '7',
-          'ZIC3'  : '6',
-          'FOXJ2' : '5',
-          'IKZF3' : '4',
-          'ZNF3'  : '3',
-          'ZNF132': '2',
-          'AGTR2' : '1', }
+topten= { 'HIF3A' : '9',
+          'KAT7'  : '8',
+          'TFDP3' : '7',
+          'TBR1'  : '6',
+          'ZIC3'  : '5',
+          'FOXJ2' : '4',
+          'IKZF3' : '3',
+          'ZNF3'  : '2',
+          'ZNF132': '1',
+          'AGTR2' : '0', }
 
 #####################
 # Add nodes to axes #
@@ -59,6 +59,12 @@ offset = 0.01
 for t in tf:
     nd = Node(t)
     axis0.add_node(nd, offset)
+
+    if t in topten:
+        nd.dwg.add(nd.dwg.circle(center=(nd.x, nd.y), r=10, stroke="black", stroke_width=1, fill="white", opacity=1))
+        nd.dwg.add(nd.dwg.text(topten[t], insert=(nd.x-4, nd.y+4)))
+
+    
     nd1 = Node(t)
     axis1.add_node(nd1, offset)
 
@@ -73,7 +79,13 @@ for t in tf:
 delta = 0.98 / float(len(ms))
 offset = 0.01
 for n in ms:
-    ms_axis.add_node(Node(n), offset)
+    nd1 = Node(n)
+    ms_axis.add_node(nd1, offset)
+
+    if n in topten:
+        nd1.dwg.add(nd1.dwg.circle(center=(nd1.x, nd1.y), r=10, stroke="black", stroke_width=1, fill="white", opacity=1))
+        nd1.dwg.add(nd1.dwg.text(topten[n], insert=(nd1.x-4, nd1.y+4)))
+    
     offset += delta
 
         
@@ -94,9 +106,13 @@ for n in etc:
 #####################
 
 for e in g.edges():
+
+
     if abs(g.get_edge_data(*e)['mi']) < 0.85:
         continue
-        
+
+    
+    # TF to TF
     if (e[0] in axis0.nodes) and (e[1] in axis1.nodes):
         h.connect(axis0, e[0],
                   10,  # source angle
@@ -104,28 +120,27 @@ for e in g.edges():
                   -10, # target angle
                   stroke_width=0.5,
                   stroke_opacity=0.3,
-                  stroke='purple',
+                  stroke='limegreen',
                   fill='none')
 
+    # TF to MS
     if (e[0] in axis1.nodes) and (e[1] in ms_axis.nodes):
-        if (e[0] in tf) and (e[1] in tf):
-            color = 'purple'
-        else:
+        if not ((e[0] in tf) and (e[1] in tf)):
             color = 'crimson'
-        h.connect(axis1, e[0],  45,
-                  ms_axis, e[1], -45,
-                  stroke_width=0.5,
-                  stroke_opacity=0.3,
-                  stroke=color,
-                  fill='none')
+            h.connect(axis1, e[0],  45,
+                      ms_axis, e[1], -45,
+                      stroke_width=0.5,
+                      stroke_opacity=0.3,
+                      stroke=color,
+                      fill='none')
 
         
 
     if (e[0] in ms_axis.nodes) and (e[1] in axis3.nodes):
         if (e[0] in tf) and (e[1] in tf):
-            color = 'purple'
-        else:
             color = 'limegreen'
+        else:
+            color = 'purple'
 
         h.connect(ms_axis, e[0], 15,
                   axis3, e[1], -15,
@@ -137,7 +152,7 @@ for e in g.edges():
         
     if (e[0] in axis3.nodes) and (e[1] in axis0.nodes):
         if (e[0] in tf) and (e[1] in tf):
-            color = 'purple'
+            color = 'limegreen'
         else:
             color = 'royalblue'
 
@@ -148,6 +163,25 @@ for e in g.edges():
                   stroke=color,
                   fill='none')
 
+
+
+
+for e in g.edges():
+
+    if abs(g.get_edge_data(*e)['mi']) < 0.85:
+        continue
+
+    # TF to MS
+    if (e[0] in axis1.nodes) and (e[1] in ms_axis.nodes):
+        if (e[0] in tf) and (e[1] in tf):
+            color = 'limegreen'
+            h.connect(axis1, e[0],  45,
+                      ms_axis, e[1], -45,
+                      stroke_width=0.5,
+                      stroke_opacity=0.9,
+                      stroke=color,
+                      fill='none')
+        
 
 
 
