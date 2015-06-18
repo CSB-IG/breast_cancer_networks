@@ -140,7 +140,7 @@ for e in g.edges():
         if (e[0] in tf) and (e[1] in tf):
             color = 'limegreen'
         else:
-            color = 'purple'
+            color = 'royalblue'
 
         h.connect(ms_axis, e[0], 15,
                   axis3, e[1], -15,
@@ -154,7 +154,7 @@ for e in g.edges():
         if (e[0] in tf) and (e[1] in tf):
             color = 'limegreen'
         else:
-            color = 'royalblue'
+            color = 'purple'
 
         h.connect(axis0, e[1], -45,
                   axis3, e[0], 45,
