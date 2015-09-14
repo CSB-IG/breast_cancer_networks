@@ -265,7 +265,7 @@ var sankey = d3.sankey()
 
 var path = sankey.link();
 
-d3.json("results.json", function(energy) {
+d3.json("results2.json", function(energy) {
 
   sankey
       .nodes(energy.nodes)
@@ -277,6 +277,7 @@ d3.json("results.json", function(energy) {
     .enter().append("path")
       .attr("class", "link")
       .attr("d", path)
+        .on("click", function(d) {console.log(d);})
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .sort(function(a, b) { return b.dy - a.dy; });
 
@@ -288,6 +289,7 @@ d3.json("results.json", function(energy) {
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      //.on("click", function(d) {console.log(d);})
     .call(d3.behavior.drag()
       .origin(function(d) { return d; })
       .on("dragstart", function() { this.parentNode.appendChild(this); })
