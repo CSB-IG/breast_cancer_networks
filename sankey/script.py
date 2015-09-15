@@ -91,31 +91,31 @@ def get_linked(search_space, links, length=0):
     G.add_weighted_edges_from(edges)
 
     def only_paths_of_size(paths):
-        return [edges for edges in list(paths.values()) if len(edges) >= length]
+        return [edges for edges in paths if len(edges) >= length]
 
     uv_key = set([])
     results = []
     target_path = {}
     print(len(search_space), len(links))
-    for link in search_space:
-        #print("SOURCE", link["source"])
+    for link in sorted(search_space, key=lambda x: x["source"]):
         shorted = nx.shortest_path(G, source=link["source"])
-        paths = only_paths_of_size(shorted)
+        paths = only_paths_of_size(list(shorted.values()))
         for edges in paths:
-            #print("PATH", edges)
+            #print("SOURCE", link["source"])
             vertices = list(zip(edges, edges[1:]))
             last_u, last_v = vertices[-1]
-            if G[last_u][last_v]["weight"] > 90:
-                for u, v in vertices:
-                    key = "{}{}".format(u,v)
-                    if not key in uv_key:
-                        uv_key.add(key)
-                        results.append({
-                            "source": u, 
-                            "target": v, 
-                            "value": G[u][v]["weight"]})
-                target_path.setdefault(v, set([]))
-                target_path[v].add("-".join([str(x) for x in edges]))
+            #if G[last_u][last_v]["weight"] > 90:
+                #print(vertices, last_u, last_v, G[last_u][last_v]["weight"])
+            for u, v in vertices:
+                key = "{}{}".format(u,v)
+                if not key in uv_key:
+                    uv_key.add(key)
+                    results.append({
+                        "source": u, 
+                        "target": v, 
+                        "value": G[u][v]["weight"]})
+            #target_path.setdefault(v, set([]))
+            #target_path[v].add("-".join([str(x) for x in edges]))
             
     return results, target_path
         
@@ -124,8 +124,9 @@ def ontology_graph(name, search_space_ontology, node_index):
     data = []
     for gene, ontologies in search_space_ontology.items():
         for key_ontology in ontologies[name]:
-            for term in ontology_term[key_ontology]:
-                data.append({"source": node_index[gene], "target": node_index[term], "value": 1})
+            #print(gene, name, key_ontology, ontology_term[key_ontology][:4])
+            term = ontology_term[key_ontology]
+            data.append({"source": node_index[gene], "target": node_index[term], "value": 1})
     return data
 
 def firma_molecular_graph(fm, gnd, ft_im):
@@ -170,19 +171,21 @@ if __name__ == '__main__':
             #print(column)
             for go in row[ontology].split("///"):
                 go_terms = go.split("//")
-                go_id = go_terms.pop(0)
-                key = go_id.strip()
-                ontology_term.setdefault(key, [])
-                ontologies.setdefault(ontology, set([]))
-                ontology_gene.setdefault(key, [])
-                gene_ontology.setdefault(row["genesym"], dict(zip(gene_ont, [[], [], []])))
-                ontologies[ontology].add(key)
-                gene_ontology[row["genesym"]][ontology].append(key)
-                ontology_gene[key].append(row["genesym"])
-                for go_term in go_terms[0:1]:
-                    #print(go_term)
-                    term = go_term.strip()
-                    ontology_term[key].append(gene_ont_abbrv[ontology]+":"+term)                    
+                if len(go_terms) >= 2:
+                    go_id = go_terms.pop(0)
+                    key = go_id.strip()
+                    ontology_term.setdefault(key, [])
+                    ontologies.setdefault(ontology, set([]))
+                    ontology_gene.setdefault(key, [])
+                    gene_ontology.setdefault(row["genesym"], dict(zip(gene_ont, [[], [], []])))
+                    ontologies[ontology].add(key)
+                    gene_ontology[row["genesym"]][ontology].append(key)
+                    ontology_gene[key].append(row["genesym"])
+                    #print(go)
+                    #for go_term in go_terms[0:1]:
+                        #print(go_term)
+                    term = go_terms[0].strip()
+                    ontology_term[key] = gene_ont_abbrv[ontology]+":"+term               
                     ontology_term_list.add(gene_ont_abbrv[ontology]+":"+term)
 
     fm_gnd_set = set(list(fm["name"]) + list(gnd["name"]))
@@ -217,14 +220,14 @@ if __name__ == '__main__':
             links.append(v)
 
     paths, target_path = get_linked(pipeline[0], links, length=len(pipeline)+1)
-    print(len(paths))
+    print("PATHS", len(paths))
     n_nodes, n_links = clean_nodes_links(nodes, paths)
     #print(len(n_links))
     result = {"nodes": [{"name": node} for node in n_nodes],
             "links": n_links}
 
-    for k in target_path:
-        print(k, len(target_path[k]))
+    #for k in target_path:
+    #    print(k, len(target_path[k]))
         #for path in target_path[k]:
         #    print(path)
     with open("results2.json", "w") as f:
