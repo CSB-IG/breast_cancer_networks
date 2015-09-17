@@ -1,5 +1,11 @@
+from optparse import OptionParser
 import pandas as pd
 import json
+
+
+ontology_term = {}
+ontology_gene = {}
+node_index = {}
 
 def read_gen_ontology():
     df = pd.read_csv(filepath_or_buffer="gen_ontology.csv")
@@ -84,7 +90,7 @@ def join(left, right):
                 "value": left_value["value"]})
     return join_data
 
-def get_linked(search_space, links, length=0):
+def get_linked(search_space, links, length=0, im=10):
     import networkx as nx
     G = nx.DiGraph()
 
@@ -104,7 +110,7 @@ def get_linked(search_space, links, length=0):
             #print("SOURCE", link["source"])
             vertices = list(zip(edges, edges[1:]))
             last_u, last_v = vertices[-1]
-            if G[last_u][last_v]["weight"] > 10:
+            if G[last_u][last_v]["weight"] >= im:
                 #print(vertices, last_u, last_v, G[last_u][last_v]["weight"])
                 for u, v in vertices:
                     key = "{}{}".format(u,v)
@@ -146,8 +152,7 @@ def firma_molecular_graph(fm, gnd, ft_im):
             "value": abs(row["im"])})
     return data
 
-
-if __name__ == '__main__':
+def run(options):
     df = read_gen_ontology()
     ft = read_ft()
     df = df.drop_duplicates(subset="genesym")
@@ -158,12 +163,10 @@ if __name__ == '__main__':
     gene_ont = ["Gene Ontology Biological Process", "Gene Ontology Cellular Component", "Gene Ontology Molecular Function"]
     gene_ont_abbrv = {"Gene Ontology Biological Process": "gbp", "Gene Ontology Cellular Component": "gcc", "Gene Ontology Molecular Function": "gmf"}
     df_ft = df[df["genesym"].isin(ft)]
-    ontology_term = {}
     gene_ontology = {}
+    ontologies = {}
     ontology_term_list = set([])
     columns = ["genesym"] + gene_ont
-    ontology_gene = {}
-    ontologies = {}
     for i, row in df_ft[columns].iterrows():
         #print(row["genesym"])
         for ontology in gene_ont:
@@ -193,7 +196,6 @@ if __name__ == '__main__':
     for gene in gene_set.intersection(fm_gnd_set):
         search_space_ontology[gene] = gene_ontology[gene]
 
-    node_index = {}
     s_nodes = set([])
     nodes = sorted(list(s_nodes.union(set(["UNKNOW"]), ft, ontology_term_list, fm_gnd_set, set(["Firma Molecular", "Genes no diferenciados"]))))
 
@@ -201,26 +203,41 @@ if __name__ == '__main__':
         if not term in node_index:
             node_index[term] = i
 
-    pipeline = [
-        #ontology_graph("Gene Ontology Cellular Component", search_space_ontology),
-        #ontology_graph("Gene Ontology Biological Process", search_space_ontology),
-        compress(ontology_graph("Gene Ontology Cellular Component", search_space_ontology)),
-        compress(ontology_graph("Gene Ontology Biological Process", search_space_ontology)),
-        #compress(ontology_graph("Gene Ontology Molecular Function", search_space_ontology)),
-        compress(firma_molecular_graph(fm, gnd, ft_im))
-        #firma_molecular_graph(fm, gnd, ft_im)
-    ]
+    pipeline = []
+    if options.cellular_component:
+        pipeline.append(compress(ontology_graph("Gene Ontology Cellular Component", search_space_ontology)))
+    if options.biological_process:
+        pipeline.append(compress(ontology_graph("Gene Ontology Biological Process", search_space_ontology)))
+    
+    #pipeline.append(compress(firma_molecular_graph(fm, gnd, ft_im)))
+    pipeline.append(firma_molecular_graph(fm, gnd, ft_im))
     links = [v for v in pipeline[0]]
     for p1, p2 in zip(pipeline, pipeline[1:]):
         for v in join(p1, p2):
             links.append(v)
 
-    #print(links[:10])
-    paths, target_path = get_linked(pipeline[0], links, length=len(pipeline)+1)
+    paths, target_path = get_linked(pipeline[0], links, length=len(pipeline)+1, im=options.im)
     print("PATHS", len(paths))
     n_nodes, n_links = clean_nodes_links(nodes, paths)
     result = {"nodes": [{"name": node} for node in n_nodes],
             "links": n_links}
 
-    with open("results2.json", "w") as f:
+    with open("sankey.json", "w") as f:
         f.write(json.dumps(result))
+
+class Test(object):
+    im = 10
+    cellular_component = True
+    biological_process = True
+
+def test():
+    options = Test()
+    run(options)
+
+if __name__ == '__main__':
+    parser = OptionParser("%prog [options]")
+    parser.add_option("-c", "--cellular_component", action="store_true", default=False)
+    parser.add_option("-b", "--biological_process", action="store_true", default=False)
+    parser.add_option("-i", "--im", action="store", default=10, type='float')
+    options, args = parser.parse_args()
+    run(options)
