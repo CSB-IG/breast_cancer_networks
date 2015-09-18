@@ -82,7 +82,7 @@ def join(left, right):
             join_data.append({
                 "source": left_value["target"], 
                 "target": right_value["target"], 
-                "value": left_value["value"]+right_value["value"]})
+                "value": right_value["value"]})
         except KeyError:
             join_data.append({
                 "source": left_value["target"], 
@@ -205,11 +205,10 @@ def run(options):
 
     pipeline = []
     if options.cellular_component:
-        pipeline.append(compress(ontology_graph("Gene Ontology Cellular Component", search_space_ontology)))
+        pipeline.append(ontology_graph("Gene Ontology Cellular Component", search_space_ontology))
     if options.biological_process:
-        pipeline.append(compress(ontology_graph("Gene Ontology Biological Process", search_space_ontology)))
+        pipeline.append(ontology_graph("Gene Ontology Biological Process", search_space_ontology))
     
-    #pipeline.append(compress(firma_molecular_graph(fm, gnd, ft_im)))
     pipeline.append(firma_molecular_graph(fm, gnd, ft_im))
     links = [v for v in pipeline[0]]
     for p1, p2 in zip(pipeline, pipeline[1:]):
