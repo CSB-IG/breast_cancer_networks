@@ -102,7 +102,7 @@ def get_linked(search_space, links, length=0, im=10):
 
     uv_key = set([])
     results = []
-    target_path = {}
+    target_path = set([])
     for link in search_space:
         shorted = nx.shortest_path(G, source=link["source"])
         paths = only_paths_of_size(list(shorted.values()))
@@ -110,18 +110,18 @@ def get_linked(search_space, links, length=0, im=10):
             #print("SOURCE", link["source"])
             vertices = list(zip(edges, edges[1:]))
             last_u, last_v = vertices[-1]
+            key_path = "".join(map(str, edges))
             if G[last_u][last_v]["weight"] >= im:
-                #print(vertices, last_u, last_v, G[last_u][last_v]["weight"])
-                for u, v in vertices:
-                    key = "{}{}".format(u,v)
-                    if not key in uv_key:
-                        uv_key.add(key)
-                        results.append({
-                            "source": u, 
-                            "target": v, 
-                            "value": G[u][v]["weight"]})
-            #target_path.setdefault(v, set([]))
-            #target_path[v].add("-".join([str(x) for x in edges]))
+                if not key_path in target_path:
+                    for u, v in vertices:
+                        key = "{}{}".format(u,v)
+                        if not key in uv_key:
+                            uv_key.add(key)
+                            results.append({
+                                "source": u, 
+                                "target": v, 
+                                "value": G[u][v]["weight"]})
+                    target_path.add(key_path)
             
     return results, target_path
         
