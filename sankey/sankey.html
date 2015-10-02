@@ -6,7 +6,7 @@
 
 
 #chart {
-  height: 2000px;
+  height: 2800px;
 }
 
 .node rect {
@@ -240,13 +240,13 @@ blockquote q:after {
 
 <p id="chart"></p>
 
-<script src="http://d3js.org/d3.v2.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://bost.ocks.org/mike/sankey/sankey.js"></script>
 <script>
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
     width = 1300 - margin.left - margin.right,
-    height = 2000 - margin.top - margin.bottom;
+    height = 2800 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.2f"),
     format = function(d) { return formatNumber(d); },
