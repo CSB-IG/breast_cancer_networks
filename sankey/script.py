@@ -218,16 +218,32 @@ def run(options):
     paths, target_path = get_linked(pipeline[0], links, length=len(pipeline)+1, im=options.im)
     print("PATHS", len(paths))
     n_nodes, n_links = clean_nodes_links(nodes, paths)
-    result = {"nodes": [{"name": node} for node in n_nodes],
-            "links": n_links}
+    result = json_sankey(n_nodes, n_links, type_=options.type)
 
     with open("sankey.json", "w") as f:
         f.write(json.dumps(result))
+
+def json_sankey(n_nodes, n_links, type_="normal"):
+    if type_ == "normal":
+        result = {"nodes": [{"name": node, "id": node.lower().replace(" ", "_") + "_score"} for node in n_nodes],
+                "links": n_links}
+    elif type_ == "directional":
+        result = {}
+        nodes = [{"name": node, "id": i, "type": "g", "number": 1, "parent": None} 
+                    for i, node in enumerate(n_nodes)]
+            
+        for n in n_links:
+            nodes[n["target"]]["parent"] = n["source"]
+
+        result["links"] = n_links
+        result["nodes"] = nodes
+    return result
 
 class Test(object):
     im = 10
     cellular_component = True
     biological_process = True
+    type = "normal"
 
 def test():
     options = Test()
@@ -237,6 +253,7 @@ if __name__ == '__main__':
     parser = OptionParser("%prog [options]")
     parser.add_option("-c", "--cellular_component", action="store_true", default=False)
     parser.add_option("-b", "--biological_process", action="store_true", default=False)
-    parser.add_option("-i", "--im", action="store", default=10, type='float')
+    parser.add_option("-i", "--im", action="store", default=.8, type='float')
+    parser.add_option("-t", "--type", action="store", default="normal", type='string')
     options, args = parser.parse_args()
     run(options)
