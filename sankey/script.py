@@ -59,17 +59,14 @@ def clean_nodes_links(nodes, links):
 
     return n_nodes, n_links
 
-def compress(data):
+def unique(data, f=lambda v:"{}{}".format(v["source"], v["target"])):
     from collections import OrderedDict
-    compress_data = OrderedDict()
+    unique_data = OrderedDict()
     for value in data:
-        key = "{}{}".format(value["source"], value["target"])
-        if key in compress_data:
-            compress_data[key]["value"] += value["value"]
-        else:
-            compress_data[key] = {"source": value["source"], "target": value["target"], "value": value["value"]}
-
-    return compress_data.values()
+        key = f(value)
+        if not key in unique_data:
+            unique_data[key] = {"source": value["source"], "target": value["target"], "value": value["value"]}
+    return unique_data.values()
 
 def join(left, right):
     from collections import defaultdict
@@ -84,10 +81,11 @@ def join(left, right):
                 "target": right_value["target"], 
                 "value": right_value["value"]})
         except KeyError:
-            join_data.append({
-                "source": left_value["target"], 
-                "target": node_index["UNKNOW"], 
-                "value": left_value["value"]})
+            pass
+            #join_data.append({
+            #    "source": left_value["target"], 
+            #    "target": node_index["UNKNOW"], 
+            #    "value": left_value["value"]})
     return join_data
 
 def get_linked(search_space, links, length=0, im=10):
@@ -100,30 +98,33 @@ def get_linked(search_space, links, length=0, im=10):
     def only_paths_of_size(paths):
         return [edges for edges in paths if len(edges) >= length]
 
-    uv_key = set([])
-    results = []
-    target_path = set([])
-    for link in search_space:
+    uv_count = {}
+    linked = []
+    search_space_unique = unique(search_space, f=lambda v:"{}".format(v["source"]))
+    for link in search_space_unique:
         shorted = nx.shortest_path(G, source=link["source"])
         paths = only_paths_of_size(list(shorted.values()))
         for edges in paths:
-            #print("SOURCE", link["source"])
             vertices = list(zip(edges, edges[1:]))
             last_u, last_v = vertices[-1]
-            key_path = "".join(map(str, edges))
             if G[last_u][last_v]["weight"] >= im:
-                if not key_path in target_path:
-                    for u, v in vertices:
-                        key = "{}{}".format(u,v)
-                        if not key in uv_key:
-                            uv_key.add(key)
-                            results.append({
-                                "source": u, 
-                                "target": v, 
-                                "value": G[u][v]["weight"]})
-                    target_path.add(key_path)
+                for u, v in vertices:
+                    key = "{}{}".format(u,v)
+                    if not key in uv_count:
+                        linked.append({
+                            "source": u, 
+                            "target": v, 
+                            "value": None})
+                        uv_count[key] = 0
+                    uv_count[key] += 1
+
+    for link in linked:
+        u = link["source"]
+        v = link["target"]
+        key = "{}{}".format(u,v)
+        link["value"] = uv_count.get(key, G[u][v]["weight"])
             
-    return results, target_path
+    return linked
         
 
 def ontology_graph(name, search_space_ontology):
@@ -160,17 +161,18 @@ def run(options):
     gnd = read_genes_no_diferenciados()
     ft_im = read_ft_im()
 
-    gene_ont = ["Gene Ontology Biological Process", "Gene Ontology Cellular Component", "Gene Ontology Molecular Function"]
-    gene_ont_abbrv = {"Gene Ontology Biological Process": "gbp", "Gene Ontology Cellular Component": "gcc", "Gene Ontology Molecular Function": "gmf"}
+    gene_ont = ["Gene Ontology Biological Process", "Gene Ontology Cellular Component", 
+                "Gene Ontology Molecular Function"]
+    gene_ont_abbrv = {"Gene Ontology Biological Process": "gbp", 
+                        "Gene Ontology Cellular Component": "gcc", 
+                        "Gene Ontology Molecular Function": "gmf"}
     df_ft = df[df["genesym"].isin(ft)]
     gene_ontology = {}
     ontologies = {}
     ontology_term_list = set([])
     columns = ["genesym"] + gene_ont
     for i, row in df_ft[columns].iterrows():
-        #print(row["genesym"])
         for ontology in gene_ont:
-            #print(column)
             for go in row[ontology].split("///"):
                 go_terms = go.split("//")
                 if len(go_terms) >= 2:
@@ -183,8 +185,6 @@ def run(options):
                     ontologies[ontology].add(key)
                     gene_ontology[row["genesym"]][ontology].append(key)
                     ontology_gene[key].append(row["genesym"])
-                    #for go_term in go_terms[0:1]:
-                        #print(go_term)
                     term = go_terms[0].strip()
                     ontology_term[key] = gene_ont_abbrv[ontology]+":"+term               
                     ontology_term_list.add(gene_ont_abbrv[ontology]+":"+term)
@@ -208,6 +208,8 @@ def run(options):
         pipeline.append(ontology_graph("Gene Ontology Cellular Component", search_space_ontology))
     if options.biological_process:
         pipeline.append(ontology_graph("Gene Ontology Biological Process", search_space_ontology))
+    if options.molecular_function:
+        pipeline.append(ontology_graph("Gene Ontology Molecular Function", search_space_ontology))
     
     pipeline.append(firma_molecular_graph(fm, gnd, ft_im))
     links = [v for v in pipeline[0]]
@@ -215,7 +217,7 @@ def run(options):
         for v in join(p1, p2):
             links.append(v)
 
-    paths, target_path = get_linked(pipeline[0], links, length=len(pipeline)+1, im=options.im)
+    paths = get_linked(pipeline[0], links, length=len(pipeline)+1, im=options.im)
     print("PATHS", len(paths))
     n_nodes, n_links = clean_nodes_links(nodes, paths)
     result = json_sankey(n_nodes, n_links, type_=options.type)
@@ -225,18 +227,10 @@ def run(options):
 
 def json_sankey(n_nodes, n_links, type_="normal"):
     if type_ == "normal":
+        result = {"nodes": [{"name": node} for node in n_nodes], "links": n_links}
+    elif type_ == "colors":
         result = {"nodes": [{"name": node, "id": node.lower().replace(" ", "_") + "_score"} for node in n_nodes],
                 "links": n_links}
-    elif type_ == "directional":
-        result = {}
-        nodes = [{"name": node, "id": i, "type": "g", "number": 1, "parent": None} 
-                    for i, node in enumerate(n_nodes)]
-            
-        for n in n_links:
-            nodes[n["target"]]["parent"] = n["source"]
-
-        result["links"] = n_links
-        result["nodes"] = nodes
     return result
 
 class Test(object):
@@ -253,7 +247,8 @@ if __name__ == '__main__':
     parser = OptionParser("%prog [options]")
     parser.add_option("-c", "--cellular_component", action="store_true", default=False)
     parser.add_option("-b", "--biological_process", action="store_true", default=False)
-    parser.add_option("-i", "--im", action="store", default=.8, type='float')
+    parser.add_option("-m", "--molecular_function", action="store_true", default=False)
+    parser.add_option("-i", "--im", action="store", default=0, type='float')
     parser.add_option("-t", "--type", action="store", default="normal", type='string')
     options, args = parser.parse_args()
     run(options)
