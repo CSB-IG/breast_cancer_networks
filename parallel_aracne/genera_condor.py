@@ -1,9 +1,10 @@
 import argparse
 import os, stat
+from sh import cp
 from jinja2 import Environment, FileSystemLoader
 
 parser = argparse.ArgumentParser(description='Generates condor submit file for aracne runs.')
-parser.add_argument('--path_to_aracne2',  type=argparse.FileType('r'), required=True, help='path to aracne2 binary')
+parser.add_argument('--aracne_tgz',  type=argparse.FileType('r'), required=True, help='path to aracne2 binary')
 parser.add_argument('--expfile',  type=argparse.FileType('r'), required=True, help='expression file')
 parser.add_argument('--probes',  type=argparse.FileType('r'), required=True, help='probes, one in every line' )
 parser.add_argument('--run_id',  required=True, help="name of condor run" )
@@ -28,16 +29,19 @@ if not os.path.exists(outdir):
     os.makedirs(outdir)
 
 
+cp(args.aracne_tgz.name, outdir)
+cp(args.expfile.name, outdir)
+
 # create aracne.sh
-aracne_path = os.path.dirname(os.path.realpath(args.path_to_aracne2.name))
 aracne_sh = """#!/bin/bash
-cd {aracne_path}
-./aracne2 $@"""
+tar xfz  ARACNE.src.tar.gz
+hostname
+
+ARACNE/aracne2 -H ARACNE $@"""
+
 with open(os.path.join(outdir,'aracne.sh'), 'w') as f:
-    f.write(aracne_sh.format(aracne_path=aracne_path))
+    f.write(aracne_sh)
     os.chmod(f.name, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH )
-
-
 
 
 
@@ -51,8 +55,10 @@ env = Environment(loader=FileSystemLoader(os.path.dirname(os.path.realpath(__fil
 template = env.get_template('condor_aracne.tt')
 
 with open(scriptname, 'w') as f:
-    f.write( template.render( expfile = expfile,
-                              probes = probes,
+    f.write( template.render( submit_expfile = expfile,
+                              run_expfile    = os.path.basename(expfile),
+                              probes         = probes,
                               p       = p,
                               outdir  = outdir,
-                              run_id  = args.run_id ) )
+                              run_id  = args.run_id,
+                              aracne_tgz = args.aracne_tgz.name ) )
