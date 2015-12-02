@@ -15,13 +15,13 @@
 <p>For generate the Condor_submit File:</p>
 
 ```
-python ~/breast_cancer_networks/parallel_aracne/genera_condor.py \
-	--path_to_aracne2 /home/hachepunto/ARACNE/aracne2 \
-	--expfile /home/hachepunto/data/Expression_Matrix_genesym_todos_sin_duplicados_colapsed.txt \
-	--probes /home/hachepunto/transfac_network/human_transfacs.txt \
-	--run_id transfac_all_10 \
-	--outdir /home/hachepunto/transfac_network/transfac_all_10 \
-	--p 1e-10
+python /home/hachepunto/breast_cancer_networks/parallel_aracne/genera_condor.py \
+	--aracne_tgz /home/hachepunto/ARACNE/ARACNE.src.tar.gz \
+	--expfile_bz2 /home/hachepunto/rauldb/subclasificacion/her2_exp_matrix.txt.bz2 \
+	--probes /home/hachepunto/rauldb/vaquerizas_plus2.txt \
+	--run_id her2_1 \
+	--outdir /home/hachepunto/rauldb/subclasificacion/her2_1 \
+	--p 1
 ```
 
 <p>For submit the run_id.condor script:</p>
