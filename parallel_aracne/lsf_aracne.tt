@@ -1,7 +1,0 @@
-echo "start on" `date` > {{ outdir }}/{{ probeid }}.log
-{{ outdir }}/aracne.sh -i {{ expfile }} \
-             -h {{ probeid }} {% if kerwid %}-k {{ kerwid }} {% endif %} \
-             -p {{ p }} \
-             -o {{ outdir }}/{{ probeid }}.adj &>> {{ outdir }}/{{ probeid }}.log
-
-echo "ended" `date` >> {{ outdir }}/{{ probeid }}.log
